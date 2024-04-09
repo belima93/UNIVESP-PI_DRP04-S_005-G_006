@@ -11,10 +11,29 @@ Integrantes do Grupo:
 
 __________________________________________________________________________
 
+## Pré Requisitos
+Para replicação deste projeto, certifique-se de ter instalado e/ou configurado os seguintes recursos:
+
+- [ ] Realize download e instalação do Python https://www.python.org/downloads/
+- [ ] Realize download e instalação do VSCODE https://code.visualstudio.com/download ou outra IDE de sua preferência.
 
 
+### Criação do Ambiente Python:
 
+Ao abrir sua IDE, acesse o Terminal e execute o comando abaixo para criação do ambiente virtual:
+```sh
+python -m venv venv
+```
 
+Ativação do Ambiente Virtual (Windows):
+```sh
+.\venv\Scripts\Activate.ps1
+```
+
+Instalação das bibliotecas necessárias utilizadas na ambiente virtual:
+```sh
+pip install -r requirements.txt
+```
 
 
 
