@@ -15,21 +15,26 @@ def cadastrar_vendedor(request):
         vendedores = Users.objects.filter(cargo ="V")
         return render(request, 'cadastrar_vendedor.html', {'vendedores': vendedores})
     if request.method == 'POST':
+        nome = request.POST.get('nome')
+        sobrenome = request.POST.get('sobrenome')
         email = request.POST.get('email')
         senha = request.POST.get('senha')
 
+        #TODO: Fazer validaçoes dos dados
         user = Users.objects.filter(email=email)
         
         if user.exists():
-            # TODO: Utilizar messages do Django
+            #TODO: Utilizar messages do Django
             return HttpResponse('Email Existente')
         
         user = Users.objects.create_user(username=email,
                                           email=email,
                                             password=senha,
+                                            first_name=nome,
+                                            last_name=sobrenome,
                                               cargo="V")
 
-        # TODO: Redirecionar com uma mensagem
+        #TODO: Redirecionar com uma mensagem
         return HttpResponse('Conta Criada')
     
 def login(request):
