@@ -1,3 +1,35 @@
-<h1>Produto</h1>
+{% extends 'base.html' %}
+{% load static %}
 
-{{form}}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'usuarios/css/css.css' %}">
+{% endblock %}
+
+{% block 'body' %}
+<div class="container">
+    <div class="card custom-card">
+        <div class="card-header">
+            <h5 class="mb-0">Editar Produto</h5>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                <br>
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            <form action="{% if produto.slug %}{% url 'editar_produto' produto.slug %}{% else %}#{% endif %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="form-group">
+                    <div>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <!-- Adicione o link para retornar à página de adição de produto -->
+                        <a href="{% url 'add_produto' %}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

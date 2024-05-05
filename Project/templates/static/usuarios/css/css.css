@@ -11,3 +11,12 @@
 .bg-hr{
     background-color: gray;
 }
+
+
+
+
+.custom-card {
+    background-color: #333 !important;;
+    color: #fff;
+    margin-top: 20px;
+}

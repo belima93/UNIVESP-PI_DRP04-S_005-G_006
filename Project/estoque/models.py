@@ -8,23 +8,24 @@ class Categoria(models.Model):
         return self.titulo
 
 class Produto(models.Model):
-    nome = models.CharField(max_length=40, unique=True)
-    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True)
-    quantidade = models.FloatField()
-    preco_compra = models.FloatField()
-    preco_venda = models.FloatField()
+    id_material = models.CharField(max_length=7,default='')
+    descricao = models.CharField(max_length=255, default='')  # Valor padrão para descricao
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    quantidade = models.IntegerField()
+    largura = models.DecimalField(max_digits=10, decimal_places=2)
+    comprimento = models.DecimalField(max_digits=10, decimal_places=2)
+    valor_peca = models.DecimalField(max_digits=10, decimal_places=2)
+    valor_m2 = models.DecimalField(max_digits=10, decimal_places=2)
     slug = models.SlugField(unique=True, blank=True, null=True)
 
-    def __str__(self) -> str:
-        return self.nome
+    def __str__(self):
+        return self.descricao
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.nome)
+            self.slug = slugify(self.descricao)
 
         return super().save(*args, **kwargs)
-
-
 
     def gerar_desconto(self, desconto):
         return self.preco_venda - ((self.preco_venda * desconto) / 100)
@@ -35,4 +36,5 @@ class Produto(models.Model):
     
 class Imagem(models.Model):
     imagem = models.ImageField(upload_to="imagem_produto")
-    produto = models.ForeignKey(Produto,on_delete=models.CASCADE)
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE, default=1)  # Exemplo de um produto padrão com ID 1
+
