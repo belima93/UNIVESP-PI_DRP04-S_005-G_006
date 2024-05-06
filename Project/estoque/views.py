@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import ProdutoForm
-from .models import Categoria, Produto, Imagem
+from .forms import MateriaPrimaForm
+from .models import Categoria,Imagem, Fornecedores, LinhaProduto, TipoMadeira, MateriaPrima
 from django.http import HttpResponse
 from PIL import Image, ImageDraw
 from datetime import date
@@ -12,28 +12,33 @@ from django.contrib import messages
 from rolepermissions.decorators import has_permission_decorator
 
 @has_permission_decorator('cadastrar_produtos')
-def add_produto(request):
+def add_materiasprimas(request):
     if request.method == "GET":
         descricao = request.GET.get('descricao')
         categoria = request.GET.get('categoria')
         id_material = request.GET.get('id_material')
-        produtos = Produto.objects.all()
+        
+        materia_prima = MateriaPrima.objects.all()
 
         if descricao:
-            produtos = produtos.filter(descricao__icontains=descricao)
+            materia_prima = materia_prima.filter(descricao__icontains=descricao)
 
         if categoria:
-            produtos = produtos.filter(categoria=categoria)
+            materia_prima = materia_prima.filter(categoria__titulo=categoria)
 
         if id_material:
-            produtos = produtos.filter(id=id_material)
+            materia_prima = materia_prima.filter(id_material=id_material)
 
         categorias = Categoria.objects.all()
-        return render(request, 'add_produto.html', {'categorias': categorias, 'produtos': produtos})
+        fornecedores = Fornecedores.objects.all()
+        
+        return render(request, 'add_materiaprima.html', {'materiasprimas': materia_prima, 'categorias': categorias, 'fornecedores': fornecedores})
+    
     elif request.method == "POST":
         id_material = request.POST.get('id_material')
         descricao = request.POST.get('descricao')
         categoria = request.POST.get('categoria')
+        fornecedor = request.POST.get('fornecedor')
         quantidade = request.POST.get('quantidade')
         largura = request.POST.get('largura')
         comprimento = request.POST.get('comprimento')
@@ -47,19 +52,22 @@ def add_produto(request):
         valor_peca = round(float(valor_peca), 2)
         valor_m2 = round(float(valor_m2), 2)
 
-        produto = Produto(id_material=id_material,
-                  descricao=descricao,
-                  categoria_id=categoria,
-                  quantidade=quantidade,
-                  largura=largura,
-                  comprimento=comprimento,
-                  valor_peca=valor_peca,
-                  valor_m2=valor_m2)
+        materia_prima = MateriaPrima(
+            id_material=id_material,
+            descricao=descricao,
+            categoria_id=categoria,
+            quantidade=quantidade,
+            largura=largura,
+            comprimento=comprimento,
+            valor_peca=valor_peca,
+            valor_m2=valor_m2
+        )
+        materia_prima.save()
+        materia_prima.fornecedores.set([fornecedor])
 
-        produto.save()
 
         for f in request.FILES.getlist('imagens'):
-            name = f'{date.today()}-{produto.id}.jpg'
+            name = f'{date.today()}-{materia_prima.id}.jpg'
 
             img = Image.open(f)
             img = img.convert('RGB')
@@ -77,36 +85,38 @@ def add_produto(request):
                                              None
                                              )
 
-            img_dj = Imagem(imagem=img_final, produto=produto)
+            img_dj = Imagem(imagem=img_final, materia_prima=materia_prima)
             img_dj.save()
-        messages.add_message(request, messages.SUCCESS, 'Produto cadastrado com sucesso')
-        return redirect(reverse('add_produto'))
-
-def produto(request, slug):
-    produto = get_object_or_404(Produto, slug=slug)
-    if request.method == "GET":
-        form = ProdutoForm(instance=produto)
-        return render(request, 'produto.html', {'form': form, 'produto': produto})
-    elif request.method == "POST":
-        form = ProdutoForm(request.POST, instance=produto)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Produto atualizado com sucesso')
-            return redirect('add_produto')  # Redireciona para a URL 'add_produto'
-        else:
-            messages.error(request, 'Ocorreu um erro ao salvar o produto. Por favor, corrija os erros abaixo.')
-            return render(request, 'produto.html', {'form': form, 'produto': produto})
+        messages.add_message(request, messages.SUCCESS, 'Materia Prima cadastrada com sucesso')
+        return redirect(reverse('add_materiasprimas'))
     
-def editar_produto(request, slug):
-    produto = get_object_or_404(Produto, slug=slug)
-    if request.method == 'POST':
-        form = ProdutoForm(request.POST, instance=produto)
+
+def MATERIAPRIMA(request, slug):
+    materia_prima_x = get_object_or_404(MateriaPrima, slug=slug)
+    if request.method == "GET":
+        form = MateriaPrimaForm(instance=materia_prima_x)
+        return render(request, 'materiaprima.html', {'form': form, 'materiaprima': materia_prima_x})
+    elif request.method == "POST":
+        form = MateriaPrimaForm(request.POST, instance=materia_prima_x)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Produto atualizado com sucesso')
-            return redirect(reverse('produto', kwargs={'slug': produto.slug}))
+            messages.success(request, 'Matéria Prima atualizada com sucesso')
+            return redirect('add_materiasprimas')  # Redireciona para a URL 'add_materiasprimas'
         else:
-            messages.error(request, 'Ocorreu um erro ao salvar o produto. Por favor, corrija os erros abaixo.')
+            messages.error(request, 'Ocorreu um erro ao salvar a matéria prima. Por favor, corrija os erros abaixo.')
+            return render(request, 'materiaprima.html', {'form': form, 'materiaprima': materia_prima_x})
+        
+
+def editar_insumos(request, slug):
+    materia_prima_x = get_object_or_404(MateriaPrima, slug=slug)
+    if request.method == 'POST':
+        form = MateriaPrimaForm(request.POST, instance=materia_prima_x)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Materia Prima atualizado com sucesso')
+            return redirect('materiaprima', slug=materia_prima_x.slug)  # Corrigir este redirecionamento
+        else:
+            messages.error(request, 'Ocorreu um erro ao salvar a materia prima. Por favor, corrija os erros abaixo.')
     else:
-        form = ProdutoForm(instance=produto)
-    return render(request, 'editar_produto.html', {'form': form, 'produto': produto})
+        form = MateriaPrimaForm(instance=materia_prima_x)
+    return render(request, 'editar_insumos.html', {'form': form, 'materia prima': materia_prima_x})

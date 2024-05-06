@@ -1,7 +1,8 @@
 from django import forms
-from .models import Produto
+from .models import MateriaPrima
 
-class ProdutoForm(forms.ModelForm):
+
+class MateriaPrimaForm(forms.ModelForm):
     class Meta:
-        model = Produto
+        model = MateriaPrima
         fields = "__all__"

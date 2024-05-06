@@ -10,7 +10,7 @@
             <div class="alert {{message.tags}}">{{message}}</div>
         {% endfor %}
     {% endif %}
-    <form action="{% url 'add_produto' %}" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+    <form action="{% url 'add_materiasprimas' %}" method="POST" enctype="multipart/form-data"> {% csrf_token %}
         <div class="row">
             <div class="col-md">
                 <label>ID Material:</label>
@@ -35,6 +35,15 @@
                     {% endfor %}
                 </select>
             </div>
+            <div class="col-md">
+                <label>Selecione a fornecedor da materia prima</label>
+                <select class="form-control" name="categoria">
+                    {% for fornecedor in fornecedores %}
+                        <option value="{{fornecedor.id}}">{{fornecedor.razao_social}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
         </div>
         <br>
         <div class="row">
@@ -70,7 +79,7 @@
     </form>
     <br>
     <hr style="background-color: gray;">
-    <form action="{% url 'add_produto' %}" method="GET">
+    <form action="{% url 'add_materiasprimas' %}" method="GET">
         <div class="row">
             <div class="col-md">
                 <input class="form-control" type="text" name="descricao" placeholder="Descrição...">
@@ -93,20 +102,20 @@
             </div>
         </div>
     </form>
-    <div class="listar_produtos">
+    <div class="listar_materiasprimas">
         <div class="row"> 
-            {% for produto in produtos %}
+            {% for materiaprima in materiasprimas %}
                 <div class="col-md">
                     <div style="background-color: #0f0f0f; width: 18rem" class="card" style="width: 18rem;">
-                        {% if produto|get_first_image %}
-                            <img width="100%" class="card-img-top" src="{{produto|get_first_image}}">
+                        {% if materiaprima|get_first_image %}
+                            <img width="100%" class="card-img-top" src="{{materiaprima|get_first_image}}">
                         {% endif %}
                         <div class="card-body">
-                            <h5 class="card-title">{{produto.descricao}}</h5>
-                            <span class="badge badge-info">{{produto.categoria}}</span>
+                            <h5 class="card-title">{{materiaprima.descricao}}</h5>
+                            <span class="badge badge-info">{{materiaprima.categoria}}</span>
                             <br>
                             <br>
-                            <a href="{% url 'produto' produto.slug %}" class="btn btn-primary">Acessar</a>
+                            <a href="{% url 'materiaprima' materiaprima.slug %}" class="btn btn-primary">Acessar</a>
                         </div>
                     </div>
                     <br>
