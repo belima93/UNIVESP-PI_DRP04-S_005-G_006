@@ -107,8 +107,8 @@
             {% for materiaprima in materiasprimas %}
                 <div class="col-md">
                     <div style="background-color: #0f0f0f; width: 18rem" class="card" style="width: 18rem;">
-                        {% if materiaprima|get_first_image %}
-                            <img width="100%" class="card-img-top" src="{{materiaprima|get_first_image}}">
+                        {% if materiaprima|get_first_image_mp %}
+                            <img width="100%" class="card-img-top" src="{{materiaprima|get_first_image_mp}}">
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{materiaprima.descricao}}</h5>

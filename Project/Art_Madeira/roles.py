@@ -6,9 +6,16 @@ class Gerente(AbstractUserRole):
         'cadastrar_produtos': True,
         'liberar_descontos': True,
         'cadastrar_vendedor': True,
+        'cadastrar_materiaprima': True,
+        'cadastrar_fornecedores': True,
+        'realizar_venda': True,
     }
 
 class Vendedor(AbstractUserRole):
     available_permissions = {
         'realizar_venda': True,
+        'cadastrar_produtos': True,
+        'cadastrar_materiaprima': True,
+        'cadastrar_fornecedores': True,
+        
     }

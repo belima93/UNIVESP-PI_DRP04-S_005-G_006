@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load filters %}
+
+{% block 'body' %}
+<div class="container">
+
+    {% if messages %}
+        <br>
+        {% for message in messages %}
+            <div class="alert {{message.tags}}">{{message}}</div>
+        {% endfor %}
+    {% endif %}
+    <form action="{% url 'add_produto' %}" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+        <div class="row">
+            <div class="col-md">
+                <label>ID Produto:</label>
+                <input class="form-control" type="text" name="id_produto">
+            </div>
+            <div class="col-md">
+                <label>Nomenclatura:</label>
+                <input class="form-control" type="text" name="nomenclatura">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md">
+                <label>Imagens:</label>
+                <input class="form-control" type="file" name="imagens" multiple>
+            </div>
+            <div class="col-md">
+                <label>Selecione a categoria do produto</label>
+                <select class="form-control" name="categoria">
+                    {% for categoria in categorias %}
+                        <option value="{{categoria.id}}">{{categoria.titulo}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md">
+                <label>Selecione o fornecedor do produto</label>
+                <select class="form-control" name="fornecedor">
+                    {% for fornecedor in fornecedores %}
+                        <option value="{{fornecedor.id}}">{{fornecedor.razao_social}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md">
+                <label>Estoque inicial:</label>
+                <input class="form-control" type="number" name="quantidade">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md">
+                <label>Comprimento (m):</label>
+                <input class="form-control" type="number" name="comprimento_M" step="0.01">
+            </div>
+            <div class="col-md">
+                <label>Altura (m):</label>
+                <input class="form-control" type="number" name="altura_M" step="0.01">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md">
+                <label>Valor por m² (R$):</label>
+                <input class="form-control" type="number" name="valor_m2" step="0.01">
+            </div>
+            <div class="col-md">
+                <label>Fundo:</label>
+                <input class="form-control" type="text" name="fundo">
+            </div>
+            <div class="col-md">
+                <label>Custo MDF:</label>
+                <input class="form-control" type="number" name="custo_MDF" step="0.01">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md">
+                <label>Tercerização:</label>
+                <input class="form-control" type="text" name="tercerizacao">
+            </div>
+            <div class="col-md">
+                <label>Corte:</label>
+                <input class="form-control" type="text" name="corte">
+            </div>
+            <div class="col-md">
+                <label>Montagem:</label>
+                <input class="form-control" type="text" name="montagem">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md">
+                <label>Lixa:</label>
+                <input class="form-control" type="text" name="lixa">
+            </div>
+            <div class="col-md">
+                <label>Acabamento Pintura:</label>
+                <input class="form-control" type="text" name="acabamento_pintura">
+            </div>
+        </div>
+        <br>
+        <input class="btn btn-success" type="submit" value="Enviar">
+    </form>
+    <br>
+    <hr style="background-color: gray;">
+    <form action="{% url 'add_produto' %}" method="GET">
+        <div class="row">
+            <div class="col-md">
+                <input class="form-control" type="text" name="nomenclatura" placeholder="Nomenclatura...">
+            </div>
+            <div class="col-md">
+                <select class="form-control" name="categoria">
+                    <option value="">Todas as categorias</option>
+                    {% for categoria in categorias %}
+                        <option value="{{categoria.id}}">{{categoria.titulo}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md">
+                <input class="form-control" type="text" name="id_produto" placeholder="ID...">
+            </div>
+            <div class="col-md">
+                <select class="form-control" name="tipo_madeira">
+                    <option value="">Todos os tipos de madeira</option>
+                    {% for tipo_madeira in tipos_madeiras %}
+                        <option value="{{tipo_madeira.titulo}}">{{tipo_madeira.titulo}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md">
+                <select class="form-control" name="linha">
+                    <option value="">Todas as linhas</option>
+                    {% for linha in linhas %}
+                        <option value="{{linha.titulo}}">{{linha.titulo}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md">
+                <input type="submit" value="Filtrar" class="btn btn-success">
+            </div>
+        </div>
+    </form>
+    <div class="listar_produtos">
+        <div class="row"> 
+            {% for produto in produtos %}
+                <div class="col-md">
+                    <div style="background-color: #0f0f0f; width: 18rem" class="card" style="width: 18rem;">
+                        <!-- Exibir detalhes do produto -->
+                    </div>
+                    <br>
+                </div>
+            {% endfor %}
+        </div> 
+    </div>
+</div>
+{% endblock %}

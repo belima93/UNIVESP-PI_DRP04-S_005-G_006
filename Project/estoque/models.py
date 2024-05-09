@@ -52,7 +52,7 @@ class MateriaPrima(models.Model):
             self.slug = slugify(self.descricao)
         return super().save(*args, **kwargs)
 
-class Mercadoria(models.Model):
+class Produto(models.Model):
     id_produto = models.CharField(max_length=7, default='')
     nomenclatura = models.CharField(max_length=255, default='')
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True)
@@ -153,8 +153,13 @@ class Mercadoria(models.Model):
         
         super().save(*args, **kwargs)
     
-class Imagem(models.Model):
-    imagem = models.ImageField(upload_to="imagem_produto")
+class Imagem_MP(models.Model):
+    imagem = models.ImageField(upload_to="imagem_materiaprima")
     materia_prima = models.ForeignKey(MateriaPrima, on_delete=models.CASCADE, default=1)
+
+
+class Imagem_Produto(models.Model):
+    imagem = models.ImageField(upload_to="imagem_produto")
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE,default=1)
 
 
