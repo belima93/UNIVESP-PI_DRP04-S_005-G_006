@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load filters %}
+
+{% block 'body' %}
+<div class="container">
+
+    {% if messages %}
+        <br>
+        {% for message in messages %}
+            <div class="alert {{message.tags}}">{{message}}</div>
+        {% endfor %}
+    {% endif %}
+    <form action="{% url 'add_fornecedor' %}" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+        <div class="row">
+            <div class="col-md">
+                <label>CNPJ:</label>
+                <input class="form-control" type="text" name="cnpj" maxlength="14" pattern="\d{14}" title="CNPJ deve conter 14 dígitos">
+            </div>  
+            <div class="col-md">
+                <label>Contato:</label>
+                <input class="form-control" type="text" name="contato" maxlength="11" pattern="\d{11}" title="Contato deve conter 11 dígitos">
+            </div>             
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md">
+                <label>Razão Social:</label>
+                <input class="form-control" type="text" name="razao_social">
+            </div>
+        </div>        
+        <br>
+        <div class="row">
+            <div class="col-md">
+                <label>Endereço:</label>
+                <input class="form-control" type="text" name="endereco">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="form-group">
+                <label for="id_lista_insumos">Lista de Insumos:</label>
+                <select name="lista_insumos" id="id_lista_insumos" multiple class="form-control">
+                    {% for materia_prima in todas_materias_primas %}
+                        <option value="{{ materia_prima.id }}" {% if materia_prima in fornecedor.lista_insumos.all %} selected {% endif %}>{{ materia_prima.descricao }}</option>
+                    {% endfor %}
+                </select>
+            </div>          
+        </div>
+        <br>
+        <input class="btn btn-success" type="submit" value="Enviar">
+    </form>
+    <br>
+    <hr style="background-color: gray;">
+    <form action="{% url 'add_fornecedor' %}" method="GET">
+        <div class="row">
+            <div class="col-md">
+                <input class="form-control" type="text" name="razao_social" placeholder="razao_social...">
+            </div>            
+            <div class="col-md">
+                <input class="form-control" type="text" name="cnpj" placeholder="cnpj...">
+            </div>
+            <div class="col-md">
+                <input type="submit" value="Filtrar" class="btn btn-success">
+            </div>
+        </div>
+    </form>
+    <div class="listar_fornecedores">
+        <div class="row"> 
+            {% if fornecedores %}
+                {% for fornecedor in fornecedores %}
+                    <div class="col-md">
+                        <div style="background-color: #0f0f0f; width: 18rem" class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ fornecedor.razao_social }}</h5>
+                                <br>
+                                <br>
+                                <a href="{% url 'fornecedor' fornecedor.slug %}" class="btn btn-primary">Acessar</a>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-md">
+                    <p>Nenhum fornecedor cadastrado ainda.</p>
+                </div>
+            {% endif %}
+        </div> 
+    </div>
+    
+</div>
+{% endblock %}

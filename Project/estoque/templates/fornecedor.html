@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'usuarios/css/css.css' %}">
+{% endblock %}
+
+{% block 'body' %}
+<div class="container">
+    <div class="card custom-card">
+        <div class="card-header">
+            <h5 class="mb-0">Editar Fornecedor</h5>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                <br>
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            <form action="{% url 'editar_fornecedor' fornecedor.slug %}" method="POST" class="form-horizontal">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="form-group">
+                    <div>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        
+                        <a href="{% url 'add_fornecedor' %}" class="btn btn-secondary">Voltar</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -14,18 +14,11 @@
         <div class="row">
             <div class="col-md">
                 <label>ID Material:</label>
-                <input class="form-control" type="text" name="id_material">
+                <input id="id_material_input" class="form-control" type="text" name="id_material" maxlength="7" pattern="[A-Za-z0-9]{1,7}" oninput="this.value = this.value.toUpperCase()">
             </div>
             <div class="col-md">
                 <label>Descrição:</label>
                 <input class="form-control" type="text" name="descricao">
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-md">
-                <label>Imagens:</label>
-                <input class="form-control" type="file" name="imagens" multiple>
             </div>
             <div class="col-md">
                 <label>Selecione a categoria do produto</label>
@@ -35,24 +28,28 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md">
-                <label>Selecione a fornecedor da materia prima</label>
-                <select class="form-control" name="categoria">
-                    {% for fornecedor in fornecedores %}
-                        <option value="{{fornecedor.id}}">{{fornecedor.razao_social}}</option>
-                    {% endfor %}
-                </select>
-            </div>
 
         </div>
         <br>
         <div class="row">
             <div class="col-md">
+                <label>Imagens:</label>
+                <input class="form-control" type="file" name="imagens_MP" multiple>
+            </div>            
+            <div class="col-md">
+                <label>Selecione a fornecedor da materia prima</label>
+                <select class="form-control" name="fornecedor">
+                    {% for fornecedor in fornecedores %}
+                        <option value="{{fornecedor.id}}">{{fornecedor.razao_social}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md">
                 <label>Estoque inicial:</label>
                 <input class="form-control" type="number" name="quantidade">
             </div>
         </div>
-        <br>
+        <br>        
         <div class="row">
             <div class="col-md">
                 <label>Largura(m):</label>
@@ -62,18 +59,12 @@
                 <label>Comprimento(m):</label>
                 <input class="form-control" type="number" name="comprimento" step="0.01">
             </div>
-        </div>
-        <br>
-        <div class="row">
             <div class="col-md">
                 <label>Valor por peça (R$):</label>
                 <input class="form-control" type="number" name="valor_peca" step="0.01">
-            </div>
-            <div class="col-md">
-                <label>Valor por m² (R$):</label>
-                <input class="form-control" type="number" name="valor_m2" step="0.01">
-            </div>
+            </div>            
         </div>
+        <br>
         <br>
         <input class="btn btn-success" type="submit" value="Enviar">
     </form>

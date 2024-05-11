@@ -14,8 +14,8 @@ def get_first_image_MP(materiaprima):
     
 
 @register.filter(name='get_first_image_produto')
-def get_first_image_MP(produto):
-    imagem = Imagem_Produto.objects.filter(product=produto).first()
+def get_first_image_produto(produto):
+    imagem = Imagem_Produto.objects.filter(produto=produto).first()
     if imagem:
         return imagem.imagem.url
     else:
