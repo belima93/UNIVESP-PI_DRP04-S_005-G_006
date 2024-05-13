@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'usuarios/css/css.css' %}">
+{% endblock %}
+
+{% block 'body' %}
+<div class="container">
+    <h1>Editar Produto</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="novo_valor_venda">Novo Valor de Venda:</label>
+            <input type="number" class="form-control" name="novo_valor_venda" id="novo_valor_venda" value="{{ produto.valor_venda }}" step="0.01">
+        </div>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="{% url 'estoque_home' %}" class="btn btn-secondary">Voltar</a>
+    </form>
+</div>
+{% endblock %}

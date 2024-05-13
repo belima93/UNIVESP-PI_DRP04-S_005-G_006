@@ -29,6 +29,12 @@
                     </div>
                 </div>
             </form>
+            <br>
+            <form action="{% url 'excluir-insumos' materiaprima.slug %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="materia_prima_id" value="{{ materiaprima.id }}">
+                <button type="submit" class="btn btn-danger">Excluir</button>
+            </form
         </div>
     </div>
 </div>

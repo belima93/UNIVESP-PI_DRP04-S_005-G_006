@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import MateriaPrimaForm, ProdutoForm, FornecedorForm
 from .models import Categoria,Imagem_MP,Imagem_Produto, Fornecedores, LinhaProduto, TipoMadeira, MateriaPrima, Produto
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from PIL import Image, ImageDraw
 from datetime import date
 from io import BytesIO
@@ -10,6 +10,11 @@ import sys
 from django.urls import reverse
 from django.contrib import messages
 from rolepermissions.decorators import has_permission_decorator
+from decimal import Decimal
+from django.dispatch import receiver
+
+
+
 
 @has_permission_decorator('cadastrar_materiaprima')
 def add_materiasprimas(request):
@@ -40,12 +45,14 @@ def add_materiasprimas(request):
         categoria = request.POST.get('categoria')
         fornecedor = request.POST.get('fornecedor')
         quantidade = request.POST.get('quantidade')
+        estoque_min= request.POST.get('estoque_min')
         largura = request.POST.get('largura')
         comprimento = request.POST.get('comprimento')
         valor_peca = request.POST.get('valor_peca')        
 
         # Convertendo para float com 2 casas decimais
         quantidade = int(quantidade)
+        estoque_min = int(estoque_min)
         largura = round(float(largura), 2)
         comprimento = round(float(comprimento), 2)
         valor_peca = round(float(valor_peca), 2)        
@@ -55,6 +62,7 @@ def add_materiasprimas(request):
             descricao=descricao,
             categoria_id=categoria,            
             quantidade=quantidade,
+            estoque_min=estoque_min,
             largura=largura,
             comprimento=comprimento,
             valor_peca=valor_peca          
@@ -127,6 +135,15 @@ def editar_insumos(request, slug):
     return render(request, 'editar_insumos.html', {'form': form, 'materia prima': materia_prima_x})
 
 
+def excluir_insumos(request, slug):
+    if request.method == 'POST':
+        materia_prima_id = request.POST.get('materia_prima_id')
+        MateriaPrima.objects.filter(id=materia_prima_id).delete()
+        messages.success(request, 'Matéria-prima excluída com sucesso')
+        return HttpResponseRedirect(reverse('add_materiasprimas'))  # ou qualquer outra página após a exclusão
+    else:
+        return HttpResponseNotAllowed(['POST'])
+
 #############################################################################################
 
 @has_permission_decorator('cadastrar_produtos')
@@ -168,6 +185,7 @@ def add_produto(request):
         tipo_madeira_id = request.POST.get('tipo_madeira')
         linha_produto_id = request.POST.get('linha_produto')
         quantidade = request.POST.get('quantidade')
+        estoque_min = request.POST.get('estoque_min')
         comprimento_M =request.POST.get('comprimento_M')
         altura_M = request.POST.get('altura_M')
         valor_m2 = request.POST.get('valor_m2')
@@ -181,6 +199,7 @@ def add_produto(request):
 
         # Convertendo para float com 2 casas decimais
         quantidade = int(quantidade)
+        estoque_min = int(estoque_min)
         comprimento_M = round(float(comprimento_M), 2)
         altura_M = round(float(altura_M), 2)
         valor_m2 = round(float(valor_m2), 2)
@@ -201,6 +220,7 @@ def add_produto(request):
             tipo_madeira_id=tipo_madeira_id,
             linha_produto_id = linha_produto_id,
             quantidade=quantidade,
+            estoque_min=estoque_min,
             comprimento_M=comprimento_M,
             altura_M=altura_M,
             valor_m2=valor_m2,            
@@ -214,6 +234,9 @@ def add_produto(request):
         
         produto.save()
         
+        calcular_custosadicionais_produto(produto)
+        calcular_custosfinais_produtos(produto)
+        valoresfinais_produto(produto)
 
 
         for f in request.FILES.getlist('imagens_produto'):
@@ -223,7 +246,7 @@ def add_produto(request):
             img = img.convert('RGB')
             img = img.resize((300, 300))
             draw = ImageDraw.Draw(img)
-            draw.text((20, 280), f"CONSTRUCT {date.today()}", (255,0,0))
+            draw.text((20, 280), f"Art_Madeira {date.today()}", (255,0,0))
             output = BytesIO()
             img.save(output, format="JPEG", quality=100)
             output.seek(0)
@@ -242,7 +265,7 @@ def add_produto(request):
         return redirect(reverse('add_produto'))
     
 
-def produto(request,slug):    
+def produto(request, slug):    
     produto_X = get_object_or_404(Produto, slug=slug)
     if request.method == "GET":
         form = ProdutoForm(instance=produto_X)
@@ -251,11 +274,13 @@ def produto(request,slug):
         form = ProdutoForm(request.POST, instance=produto_X)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Produto atualizada com sucesso')
-            return redirect('add_produto')  # Redireciona para a URL 'add_materiasprimas'
+            # Após salvar o formulário, chame a função para recalcular os valores finais do produto
+            valoresfinais_produto(request)
+            messages.success(request, 'Produto atualizado com sucesso')
+            return redirect('add_produto')  # Redireciona para a URL 'add_produto'
         else:
             messages.error(request, 'Ocorreu um erro ao salvar o produto. Por favor, corrija os erros abaixo.')
-            return render(request, 'produto.html', {'form': form, 'materiaprima': produto_X})  
+            return render(request, 'produto.html', {'form': form, 'materiaprima': produto_X})
 
 
 
@@ -272,6 +297,53 @@ def editar_produto(request, slug):
     else:
         form = ProdutoForm(instance=produto_X)
     return render(request, 'editar_produto.html', {'form': form, 'produto': produto_X})
+
+def calcular_custosadicionais_produto(produto):
+
+    produtos = Produto.objects.all()
+
+    for produto in produtos:
+        produto.custo_da_madeira = round(float((produto.comprimento_M * produto.altura_M) * produto.valor_m2), 2)
+        produto.P_V_Madeira_x4 = round(float(produto.custo_da_madeira * 4), 2)
+        produto.fundo_total_x4 = round(float(produto.fundo * 4), 2)
+        produto.P_V_MDF_x2 = round(float(produto.custo_MDF * 2), 2)
+        produto.P_V_Terc =  round(float(produto.tercerizacao * 2), 2)
+
+        produto.save()
+
+    
+def calcular_custosfinais_produtos(produto):
+
+    produtos = Produto.objects.all()
+
+    for produto in produtos:
+
+        produto.custo_final =  round(float(produto.custo_da_madeira + produto.fundo + produto.custo_MDF + produto.tercerizacao + produto.corte + produto.montagem + produto.lixa + produto.acabamento_pintura),2)
+
+        produto.valor_sugerido = round(float(produto.P_V_Madeira_x4 + produto.fundo_total_x4 + produto.P_V_MDF_x2 + produto.P_V_Terc + produto.corte + produto.montagem + produto.lixa + produto.acabamento_pintura),2)
+
+        produto.save()
+
+
+def valoresfinais_produto(request):
+    produtos = Produto.objects.all()
+
+    for produto in produtos:
+        if not produto.valor_venda:
+            produto.valor_venda = round(float(produto.valor_sugerido), 2)
+        produto.lucro = round(float(produto.valor_venda) - float(produto.valor_sugerido), 2)
+        produto.save()
+
+
+def excluir_produto(request, slug):
+    if request.method == 'POST':
+        produto_id = request.POST.get('produto_id')
+        Produto.objects.filter(id=produto_id).delete()
+        messages.success(request, 'Produto excluído com sucesso')
+        return HttpResponseRedirect(reverse('add_produto'))  # ou qualquer outra página após a exclusão
+    else:
+        return HttpResponseNotAllowed(['POST'])
+    
 
 
 #############################################################################################
@@ -348,6 +420,37 @@ def editar_fornecedor(request,slug):
         form = FornecedorForm(instance=fornecedor_x)
     return render(request, 'editar_fornecedor.html', {'form': form, 'fornecedor': fornecedor_x})
 
+def excluir_fornecedor(request, slug):
+    if request.method == 'POST':
+        fornecedor_id = request.POST.get('fornecedor_id')
+        Fornecedores.objects.filter(id=fornecedor_id).delete()
+        messages.success(request, 'Fornecedor excluído com sucesso')
+        return HttpResponseRedirect(reverse('add_fornecedor'))  # ou qualquer outra página após a exclusão
+    else:
+        return HttpResponseNotAllowed(['POST'])
+
+#######################################################
+
+
+def home(request):
+    produtos = Produto.objects.all()
+    materias_primas = MateriaPrima.objects.all()
+    return render(request, 'estoque_home.html', {'produtos': produtos, 'materias_primas': materias_primas})
 
 
 
+def prod_valor_venda(request, slug):    
+    produto = get_object_or_404(Produto, slug=slug)
+    if request.method == 'POST':
+        novo_valor_venda = request.POST.get('novo_valor_venda')
+        try:
+            novo_valor_venda = round(float(novo_valor_venda), 2)
+            produto.valor_venda = novo_valor_venda
+            produto.save()
+            # Chama o método para atualizar o lucro do produto
+            produto.atualizar_lucro()
+            messages.success(request, 'Valor de venda atualizado com sucesso')
+            return redirect('estoque_home')
+        except ValueError:
+            messages.error(request, 'Por favor, insira um valor válido para o novo valor de venda.')
+    return render(request, 'prod_valor_venda.html', {'produto': produto})

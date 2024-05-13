@@ -43,11 +43,12 @@ class MateriaPrima(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True)
     fornecedores = models.ManyToManyField(Fornecedores, related_name='materias_primas')
     quantidade = models.IntegerField()
+    estoque_min = models.IntegerField(default=0)
     largura = models.DecimalField(max_digits=10, decimal_places=2)
     comprimento = models.DecimalField(max_digits=10, decimal_places=2)
     valor_peca = models.DecimalField(max_digits=10, decimal_places=2)    
     slug = models.SlugField(unique=True, blank=True, null=True)
-    imagens_MP = models.ImageField(upload_to='imagem_materiasprimas/', blank=True)
+    imagens_MP = models.ImageField(upload_to='imagem_materiaprima/', blank=True)
 
     def __str__(self):
         return self.descricao
@@ -64,6 +65,7 @@ class Produto(models.Model):
     tipo_madeira = models.ForeignKey(TipoMadeira, on_delete=models.SET_NULL, null=True)
     linha_produto = models.ForeignKey(LinhaProduto, on_delete=models.SET_NULL, null=True)
     quantidade = models.IntegerField()
+    estoque_min = models.IntegerField(default=0)
     comprimento_M = models.DecimalField(max_digits=10, decimal_places=2)
     altura_M = models.DecimalField(max_digits=10, decimal_places=2)      
     valor_m2 = models.DecimalField(max_digits=10, decimal_places=2)     
@@ -75,7 +77,24 @@ class Produto(models.Model):
     lixa = models.DecimalField(max_digits=10, decimal_places=2)  
     acabamento_pintura = models.DecimalField(max_digits=10, decimal_places=2) 
     slug = models.SlugField(unique=True, blank=True, null=True)
-    imagens_produto = models.ImageField(upload_to='imgprodutos/', blank=True)
+    imagens_produto = models.ImageField(upload_to='imagem_produto/', blank=True)
+    
+    custo_final = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    valor_sugerido = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    valor_venda = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    lucro = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    custo_da_madeira = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    P_V_Madeira_x4 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    fundo_total_x4 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    P_V_MDF_x2 = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    P_V_Terc = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    def atualizar_lucro(self):
+        if self.valor_venda:
+            self.lucro = round(float(self.valor_venda) - float(self.custo_final), 2)
+            self.save()
+
 
     def __str__(self) -> str:
         return self.nomenclatura
@@ -93,5 +112,3 @@ class Imagem_MP(models.Model):
 class Imagem_Produto(models.Model):
     imagem = models.ImageField(upload_to="imagem_produto")
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE,default=1)
-
-

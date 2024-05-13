@@ -29,6 +29,12 @@
                     </div>
                 </div>
             </form>
+            <form action="{% url 'excluir_fornecedor' fornecedor.slug %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="fornecedor_id" value="{{ fornecedor.id }}">
+                <button type="submit" class="btn btn-danger">Excluir</button>
+            </form>
+
         </div>
     </div>
 </div>
