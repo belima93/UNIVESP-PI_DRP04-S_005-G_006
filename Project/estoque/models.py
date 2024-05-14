@@ -50,6 +50,19 @@ class MateriaPrima(models.Model):
     slug = models.SlugField(unique=True, blank=True, null=True)
     imagens_MP = models.ImageField(upload_to='imagem_materiaprima/', blank=True)
 
+    def status_estoque(self):
+        if self.quantidade == 0:
+            return "Sem Estoque"
+        elif self.quantidade < 0.8 * self.estoque_min:
+            return "Estoque Crítico"
+        elif 0.8 * self.estoque_min <= self.quantidade < 1.2 * self.estoque_min:
+            return "Estoque Baixo"
+        elif 1.2 * self.estoque_min <= self.quantidade <= 1.5 * self.estoque_min:
+            return "Estoque Médio"
+        else: # self.quantidade > 1.5 * self.estoque_min
+            return "Estoque Alto"  
+
+
     def __str__(self):
         return self.descricao
 
@@ -94,6 +107,20 @@ class Produto(models.Model):
         if self.valor_venda:
             self.lucro = round(float(self.valor_venda) - float(self.custo_final), 2)
             self.save()
+
+    def status_estoque(self):
+        if self.quantidade == 0:
+            return "Sem Estoque"
+        elif self.quantidade < 0.8 * self.estoque_min:
+            return "Estoque Crítico"
+        elif 0.8 * self.estoque_min <= self.quantidade < 1.2 * self.estoque_min:
+            return "Estoque Baixo"
+        elif 1.2 * self.estoque_min <= self.quantidade <= 1.5 * self.estoque_min:
+            return "Estoque Médio"
+        else: # self.quantidade > 1.5 * self.estoque_min
+            return "Estoque Alto"       
+
+        
 
 
     def __str__(self) -> str:

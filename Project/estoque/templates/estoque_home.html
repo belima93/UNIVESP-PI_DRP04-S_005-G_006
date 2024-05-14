@@ -37,7 +37,7 @@
                     <td style="text-align: center;">{{ produto.id_produto }}</td>
                     <td style="text-align: center;">{{ produto.quantidade }}</td>
                     <td style="text-align: center;">{{ produto.estoque_min }}</td>
-                    <td style="text-align: center;">Teste</td>
+                    <td style="text-align: center;">{{ produto.status_estoque }}</td>
                     <td style="text-align: center;">{{ produto.custo_final}}</td>
                     <td style="text-align: center;">{{ produto.valor_sugerido}}</td>
                     <td style="text-align: center;">{{ produto.valor_venda }}</td>
@@ -47,6 +47,10 @@
                 {% endfor %}
             </tbody>
         </table>
+        <div class="mb-3">
+            <a href="{% url 'add_produto' %}" class="btn btn-primary">Produto</a>
+        </div>
+
     </div>
    <br>
    <br>
@@ -74,7 +78,7 @@
                     <td style="text-align: center;">{{ materia_prima.id_material }}</td>
                     <td style="text-align: center;">{{ materia_prima.quantidade}}</td>
                     <td style="text-align: center;">{{ materia_prima.estoque_min }}</td>
-                    <td style="text-align: center;">Teste</td>
+                    <td style="text-align: center;">{{ materia_prima.status_estoque }}</td>
                     <td style="text-align: center;">{{ materia_prima.valor_peca }}</td>
                     
                     
@@ -82,6 +86,11 @@
                 {% endfor %}
             </tbody>
         </table>
+        <div class="mb-3">
+            <a href="{% url 'add_materiasprimas' %}" class="btn btn-primary">Matéria-Prima</a>
+            <a href="{% url 'add_fornecedor' %}" class="btn btn-primary">Fornecedor</a>            
+        </div>
+
     </div>
 
 

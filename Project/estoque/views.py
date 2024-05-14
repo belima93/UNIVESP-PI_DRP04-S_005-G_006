@@ -435,7 +435,15 @@ def excluir_fornecedor(request, slug):
 def home(request):
     produtos = Produto.objects.all()
     materias_primas = MateriaPrima.objects.all()
-    return render(request, 'estoque_home.html', {'produtos': produtos, 'materias_primas': materias_primas})
+
+    # Adiciona o status de estoque a cada produto
+    for produto in produtos:
+        produto.status_estoque = produto.status_estoque()
+
+    for materia_prima in materias_primas:
+        materia_prima.status_estoque = materia_prima.status_estoque()
+
+    return render(request, 'estoque_home.html', {'produtos': produtos,'materias_primas': materias_primas})
 
 
 
