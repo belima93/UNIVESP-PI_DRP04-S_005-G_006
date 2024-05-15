@@ -37,9 +37,3 @@ def vendas_produto(request):
 
     produtos = Produto.objects.all()
     return render(request, 'vendas_produto.html', {'produtos': produtos})
-
-
-
-
-def gerar_produto():
-    pass

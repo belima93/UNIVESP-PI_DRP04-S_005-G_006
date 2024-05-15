@@ -5,7 +5,7 @@ urlpatterns = [
     
     path('add_materiaprima/', views.add_materiasprimas, name = 'add_materiasprimas'),
     path('materiaprima/<slug:slug>/', views.MATERIAPRIMA, name = 'materiaprima'),
-    path('editar_materiaprima/<slug:slug>/', views.editar_insumos, name='editar_materiaprima'),
+    path('editar_materiaprima/<slug:slug>/', views.editar_insumos, name='editar_materiaprima'),    
     path('excluir-insumos/<slug:slug>/', views.excluir_insumos, name='excluir-insumos'),
     path('add_produto/', views.add_produto, name="add_produto"),
     path('produto/<slug:slug>', views.produto, name="produto"),

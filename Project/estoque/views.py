@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import MateriaPrimaForm, ProdutoForm, FornecedorForm
 from .models import Categoria,Imagem_MP,Imagem_Produto, Fornecedores, LinhaProduto, TipoMadeira, MateriaPrima, Produto
+from vendas.models import Vendas,Insumos
 from django.http import HttpResponse, HttpResponseRedirect
 from PIL import Image, ImageDraw
 from datetime import date
@@ -12,6 +13,8 @@ from django.contrib import messages
 from rolepermissions.decorators import has_permission_decorator
 from decimal import Decimal
 from django.dispatch import receiver
+import json
+
 
 
 
@@ -143,6 +146,7 @@ def excluir_insumos(request, slug):
         return HttpResponseRedirect(reverse('add_materiasprimas'))  # ou qualquer outra página após a exclusão
     else:
         return HttpResponseNotAllowed(['POST'])
+    
 
 #############################################################################################
 
@@ -345,7 +349,6 @@ def excluir_produto(request, slug):
         return HttpResponseNotAllowed(['POST'])
     
 
-
 #############################################################################################
 
 
@@ -403,8 +406,7 @@ def fornecedor(request,slug):
             messages.error(request, 'Ocorreu um erro ao salvar o fornecedor. Por favor, corrija os erros abaixo.')
             return render(request, 'fornecedor.html', {'form': form, 'fornecedor': fornecedor_x})
 
-    
-
+  
 
 def editar_fornecedor(request,slug):
     fornecedor_x = get_object_or_404(Fornecedores, slug=slug)
@@ -462,3 +464,6 @@ def prod_valor_venda(request, slug):
         except ValueError:
             messages.error(request, 'Por favor, insira um valor válido para o novo valor de venda.')
     return render(request, 'prod_valor_venda.html', {'produto': produto})
+
+
+###############################################################################################################
