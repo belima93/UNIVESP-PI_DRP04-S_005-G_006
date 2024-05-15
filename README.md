@@ -10,7 +10,27 @@ Integrantes do Grupo:
 - Roddy E. Ramos Gonzáles, RA 2211457
 
 __________________________________________________________________________
+## Demo
+Apresentação dos insights da aplicação:
 
+ - Framework hospedado na url:
+
+https://my-app-univesp-control-estoque-748b428833d1.herokuapp.com/auth/login/
+
+<i>OBS: Necessário possuir login para acessar</i>
+
+
+
+
+
+
+
+
+
+
+
+
+__________________________________________________________________________
 ## Pré Requisitos
 Para replicação deste projeto, certifique-se de ter instalado e/ou configurado os seguintes recursos:
 
@@ -20,7 +40,7 @@ Para replicação deste projeto, certifique-se de ter instalado e/ou configurado
 - [ ] Realize download e instalação do GIT  https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
 
-### Criação do Ambiente Python:
+### 1 - Criação do Ambiente Python:
 
 Ao abrir sua IDE, acesse o Terminal e execute o comando abaixo para criação do ambiente virtual:
 ```sh
@@ -49,4 +69,17 @@ Inicia um servidor web local:
 ```sh
 py manage.py runserver
 ```
+
+### 2 - Criação do Deploy:
+
+Realizando o login e deploy no Heroku:
+```sh
+heroku login
+git init
+heroku git:remote -a your_app
+git add .
+git commit -am ":rocket: feat: Deploy Inicial"
+git push heroku master
+```
+Caso sua aplicação esteja configurada corretamente. Terá exato no deploy, e Heroku irá devolver a url pertecente a sua aplicação:
 
