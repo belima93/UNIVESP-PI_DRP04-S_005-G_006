@@ -331,7 +331,7 @@ def valoresfinais_produto(request):
     for produto in produtos:
         if not produto.valor_venda:
             produto.valor_venda = round(float(produto.valor_sugerido), 2)
-        produto.lucro = round(float(produto.valor_venda) - float(produto.valor_sugerido), 2)
+        produto.lucro = round(float(produto.valor_venda) - float(produto.custo_final), 2)
         produto.save()
 
 

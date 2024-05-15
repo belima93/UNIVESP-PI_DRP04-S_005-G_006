@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load filters %}
+
+{% block 'body' %}
+<div class="container">
+
+    {% if messages %}
+        <br>
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    <br><br>
+    <div class="container">
+        <form method="POST" action="{% url 'vendas_produto' %}">
+            {% csrf_token %}
+            <table class="table" id="tabela-produtos">
+                <thead>
+                    <tr>
+                        <th scope="col">Produto</th>
+                        <th scope="col">Quantidade Disponível</th>
+                        <th scope="col">Valor</th>
+                        <th scope="col">Ação</th>
+                        <th scope="col">Quantidade de Vendas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produto in produtos %}
+                    <tr>
+                        <td>{{ produto.nomenclatura }}</td>
+                        <td>{{ produto.quantidade }}</td>
+                        <td>{{ produto.valor_venda }}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" onclick="adicionarProduto(this, '{{ produto.id }}', '{{ produto.nomenclatura }}', '{{ produto.valor_venda }}')">Adicionar</button>
+
+                        </td>
+                        <td>
+                            <input type="number" id="quantidade-{{ produto.id }}" name="quantidade" value="1" min="1">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="lista-compra">
+                <h3>Lista de Compra</h3>
+                <ul id="lista-compra">
+                    <!-- Os produtos selecionados serão adicionados aqui dinamicamente -->
+                </ul>
+                <p>Total: <span id="total">R$ 0,00</span></p>
+                <input type="hidden" id="produtos-input" name="produtos">
+                <input type="hidden" id="quantidades-input" name="quantidades">
+                <button id="btn-finalizar-compra" type="submit" class="btn btn-primary">Finalizar Compra</button>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let produtosSelecionados = [];
+    let quantidadesSelecionadas = [];
+
+    function adicionarProduto(button, idProduto, nomeProduto, valorProduto) {
+    // Desabilitar o botão para evitar cliques repetidos
+    button.disabled = true;
+    
+    let quantidade = document.getElementById('quantidade-' + idProduto).value;
+    
+    // Verificar se o produto já foi adicionado
+    if (!produtosSelecionados.includes(idProduto)) {
+        produtosSelecionados.push(idProduto);
+        quantidadesSelecionadas.push(quantidade);
+        
+        let itemLista = document.createElement("li");
+        itemLista.textContent = quantidade + 'x ' + nomeProduto;
+        document.getElementById("lista-compra").appendChild(itemLista);
+        
+        atualizarTotal(quantidade, valorProduto);
+        atualizarInputs();
+    }
+    
+    // Reabilitar o botão após a função ter concluído
+    button.disabled = false;
+    }
+
+
+    function atualizarTotal(quantidade, valorProduto) {
+        let totalAnterior = parseFloat(document.getElementById("total").innerText.substring(3)); // Remove o "R$ " do início
+        let totalNovo = totalAnterior + (parseInt(quantidade) * parseFloat(valorProduto));
+        document.getElementById("total").innerText = "R$ " + totalNovo.toFixed(2); // Arredonda para 2 casas decimais
+    }
+
+    function atualizarInputs() {
+        document.getElementById('produtos-input').value = JSON.stringify(produtosSelecionados);
+        document.getElementById('quantidades-input').value = JSON.stringify(quantidadesSelecionadas);
+    }
+</script>
+{% endblock %}
