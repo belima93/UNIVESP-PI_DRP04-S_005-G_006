@@ -22,10 +22,10 @@ class LinhaProduto(models.Model):
     
 
 class Fornecedores(models.Model):
-    cnpj = models.CharField(max_length=14, default='00000000000100', validators=[RegexValidator(regex='^\d{14}$', message='CNPJ deve conter 14 dígitos')])
+    cnpj = models.CharField(max_length=14, default='00000000000100', validators=[RegexValidator(regex='^\\d{14}$', message='CNPJ deve conter 14 dígitos')])
     razao_social = models.CharField(max_length=255, default='')
     endereco = models.CharField(max_length=255, default='')
-    contato = models.CharField(max_length=11, default='99999999999', validators=[RegexValidator(regex='^\d{11}$', message='Contato deve conter 11 dígitos')])
+    contato = models.CharField(max_length=11, default='99999999999', validators=[RegexValidator(regex='^\\d{11}$', message='Contato deve conter 11 dígitos')])
     lista_insumos = models.ManyToManyField('MateriaPrima', related_name='fornecedores_rel', blank=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
 
