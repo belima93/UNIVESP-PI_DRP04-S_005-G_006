@@ -268,7 +268,7 @@ def add_produto(request):
         messages.add_message(request, messages.SUCCESS, 'Produto cadastrado com sucesso')
         return redirect(reverse('add_produto'))
     
-
+@has_permission_decorator('cadastrar_produtos')
 def produto(request, slug):    
     produto_X = get_object_or_404(Produto, slug=slug)
     if request.method == "GET":
@@ -287,7 +287,7 @@ def produto(request, slug):
             return render(request, 'produto.html', {'form': form, 'materiaprima': produto_X})
 
 
-
+@has_permission_decorator('cadastrar_produtos')
 def editar_produto(request, slug):
     produto_X = get_object_or_404(Produto, slug=slug)
     if request.method == 'POST':
@@ -302,6 +302,7 @@ def editar_produto(request, slug):
         form = ProdutoForm(instance=produto_X)
     return render(request, 'editar_produto.html', {'form': form, 'produto': produto_X})
 
+@has_permission_decorator('cadastrar_produtos')
 def calcular_custosadicionais_produto(produto):
 
     produtos = Produto.objects.all()
@@ -315,7 +316,7 @@ def calcular_custosadicionais_produto(produto):
 
         produto.save()
 
-    
+@has_permission_decorator('cadastrar_produtos')    
 def calcular_custosfinais_produtos(produto):
 
     produtos = Produto.objects.all()
@@ -338,7 +339,7 @@ def valoresfinais_produto(request):
         produto.lucro = round(float(produto.valor_venda) - float(produto.custo_final), 2)
         produto.save()
 
-
+@has_permission_decorator('cadastrar_produtos')
 def excluir_produto(request, slug):
     if request.method == 'POST':
         produto_id = request.POST.get('produto_id')
@@ -351,7 +352,7 @@ def excluir_produto(request, slug):
 
 #############################################################################################
 
-
+@has_permission_decorator('cadastrar_fornecedores')
 def add_fornecedor(request):
     if request.method == "GET":
         razao_social = request.GET.get('razao_social')
@@ -389,7 +390,7 @@ def add_fornecedor(request):
         messages.add_message(request, messages.SUCCESS, 'Fornecedor cadastrado com sucesso')
         return redirect(reverse('add_fornecedor'))
 
-
+@has_permission_decorator('cadastrar_fornecedores')
 def fornecedor(request,slug):
 
     fornecedor_x = get_object_or_404(Fornecedores, slug=slug)
@@ -407,7 +408,7 @@ def fornecedor(request,slug):
             return render(request, 'fornecedor.html', {'form': form, 'fornecedor': fornecedor_x})
 
   
-
+@has_permission_decorator('cadastrar_fornecedores')
 def editar_fornecedor(request,slug):
     fornecedor_x = get_object_or_404(Fornecedores, slug=slug)
     if request.method == 'POST':
@@ -422,6 +423,7 @@ def editar_fornecedor(request,slug):
         form = FornecedorForm(instance=fornecedor_x)
     return render(request, 'editar_fornecedor.html', {'form': form, 'fornecedor': fornecedor_x})
 
+@has_permission_decorator('cadastrar_fornecedores')
 def excluir_fornecedor(request, slug):
     if request.method == 'POST':
         fornecedor_id = request.POST.get('fornecedor_id')
@@ -433,7 +435,7 @@ def excluir_fornecedor(request, slug):
 
 #######################################################
 
-
+@has_permission_decorator('realizar_venda')
 def home(request):
     produtos = Produto.objects.all()
     materias_primas = MateriaPrima.objects.all()
@@ -448,7 +450,7 @@ def home(request):
     return render(request, 'estoque_home.html', {'produtos': produtos,'materias_primas': materias_primas})
 
 
-
+@has_permission_decorator('realizar_venda')
 def prod_valor_venda(request, slug):    
     produto = get_object_or_404(Produto, slug=slug)
     if request.method == 'POST':

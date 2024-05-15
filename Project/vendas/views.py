@@ -3,7 +3,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Vendas
 from estoque.models import Produto
+from rolepermissions.decorators import has_permission_decorator
 
+@has_permission_decorator('realizar_venda')
 def vendas_produto(request):
     if request.method == 'POST':
         data = request.POST
