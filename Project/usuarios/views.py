@@ -20,12 +20,14 @@ def cadastrar_vendedor(request):
         email = request.POST.get('email')
         senha = request.POST.get('senha')
 
-        #TODO: Fazer validaçoes dos dados
+        
         user = Users.objects.filter(email=email)
         
         if user.exists():
-            #TODO: Utilizar messages do Django
-            return HttpResponse('Email Existente')
+            
+            messages.add_message(request, messages.ERROR, 'Email Existente')        
+            return redirect(reverse('cadastrar_vendedor'))
+            
         
         user = Users.objects.create_user(username=email,
                                           email=email,
@@ -34,8 +36,9 @@ def cadastrar_vendedor(request):
                                             last_name=sobrenome,
                                               cargo="V")
 
-        #TODO: Redirecionar com uma mensagem
-        return HttpResponse('Conta Criada')
+               
+        messages.add_message(request, messages.SUCCESS, 'Conta Criada')        
+        return redirect(reverse('cadastrar_vendedor'))
     
 def login(request):
     if request.method == "GET":
@@ -50,14 +53,18 @@ def login(request):
         user = auth.authenticate(username =login, password=senha)
 
         if not user:
-            #TODO: Redirecionar com mensagem de erro
-            return HttpResponse('Usuario inválido')
+            
+            
+            messages.add_message(request, messages.ERROR, 'Usuario inválido')
+            return redirect(reverse('login'))
         
-        auth.login(request,user)
-        return HttpResponse('Usuario logado com sucesso')
+        auth.login(request,user)        
+        messages.add_message(request, messages.SUCCESS, 'Usuario logado com sucesso')
+        return redirect('vendas_produto')
 
 def logout(request):
     request.session.flush()
+    messages.add_message(request, messages.SUCCESS, 'Desconectado')
     return redirect(reverse('login'))
 
 @has_permission_decorator('cadastrar_vendedor')
